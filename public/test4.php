@@ -9,12 +9,15 @@ $builder->useAutowiring(true);
 $builder->useAnnotations(false);
 $builder->addDefinitions([
     "prefix"=>"myprefix",
-    "MailerInterface"=>DI\object(MyMailer::class),
+    "mailer"=>DI\object(MyMailer::class),
     "logger"=>function (\DI\Container $c)
     {
         return new MyLogger($c->get("prefix"));
     },
-    "userManager"=>DI\object(MyUserManager::class),
+    "userManager"=>function (\DI\Container $c)
+    {
+        return new MyUserManager($c->get("mailer"));
+    },
     "controller"=>function (\DI\Container $c)
     {
         return new MyController($c->get("userManager"),$c->get("logger"));

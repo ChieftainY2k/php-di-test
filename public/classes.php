@@ -1,6 +1,11 @@
 <?php
 
-class Mailer
+interface MailerInterface
+{
+    public function mail($recipient, $content);
+}
+
+class MyMailer implements  MailerInterface
 {
     public function mail($recipient, $content)
     {
@@ -18,7 +23,7 @@ interface LoggerInterface
     public function log($message);
 }
 
-class Logger implements LoggerInterface
+class MyLogger implements LoggerInterface
 {
 
     private $prefix;
@@ -39,11 +44,18 @@ class Logger implements LoggerInterface
 
 ////////////////////////////////////////////////////////////////////////////////
 
-class UserManager
+interface UserManagerInterface
+{
+    public function __construct(MailerInterface $mailer);
+    public function register($email, $password);
+}
+
+
+class MyUserManager implements UserManagerInterface
 {
     private $mailer;
 
-    public function __construct(Mailer $mailer)
+    public function __construct(MailerInterface $mailer)
     {
         echo "Executing " . __CLASS__ . "::" . __METHOD__ . "(" . get_class($mailer) . ")\n";
         $this->mailer = $mailer;
@@ -60,7 +72,7 @@ class UserManager
 
 interface ControllerInterface
 {
-    public function __construct(UserManager $userManager, LoggerInterface $logger);
+    public function __construct(UserManagerInterface $userManager, LoggerInterface $logger);
 
     public function doSomething();
 }
@@ -70,7 +82,7 @@ class MyController implements ControllerInterface
     private $userManager;
     private $logger;
 
-    public function __construct(UserManager $userManager, LoggerInterface $logger)
+    public function __construct(UserManagerInterface $userManager, LoggerInterface $logger)
     {
         echo "Executing " . __CLASS__ . "::" . __METHOD__ . "(" . get_class($userManager) . "," . get_class($logger) . ")\n";
         $this->userManager = $userManager;
