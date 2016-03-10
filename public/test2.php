@@ -1,9 +1,16 @@
 <?php
 
 require "../vendor/autoload.php";
-require "./classes.php";
 
-$container = DI\ContainerBuilder::buildDevContainer();
+
+
+$builder = new \DI\ContainerBuilder();
+//$builder->useAutowiring(false);
+//$builder->useAnnotations(false);
+$builder->addDefinitions([
+
+]);
+$container = $builder->build();
 
 $userManager = $container->get(UserManager::class);
 $userManager->register("ala@makota.pl","abcd");
