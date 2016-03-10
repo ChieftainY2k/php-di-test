@@ -41,6 +41,18 @@ class MyLogger implements LoggerInterface
     }
 }
 
+class TheirLogger extends MyLogger
+{
+
+}
+
+class LoggerFactory
+{
+    public function create()
+    {
+        return new MyLogger();
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -91,7 +103,25 @@ class MyController implements ControllerInterface
 
     public function doSomething()
     {
+        echo "Executing " . __CLASS__ . "::" . __METHOD__ . "()\n";
         $this->userManager->register("ala@makota.pl","password");
         $this->logger->log("New user was just registered");
+    }
+}
+
+class CachedControllerWrapper
+{
+    private $originalController;
+
+    public function __construct(ControllerInterface $originalController)
+    {
+        echo "Executing " . __CLASS__ . "::" . __METHOD__ . "(" . get_class($originalController) . ")\n";
+        $this->originalController = $originalController;
+    }
+
+    public function doSomething()
+    {
+        echo "Executing " . __CLASS__ . "::" . __METHOD__ . "()\n";
+        $this->originalController->doSomething();
     }
 }
