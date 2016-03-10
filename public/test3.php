@@ -5,23 +5,28 @@ require "./classes.php";
 
 
 $builder = new \DI\ContainerBuilder();
-//$builder->useAutowiring(false);
-//$builder->useAnnotations(false);
+$builder->useAutowiring(true);
+$builder->useAnnotations(false);
 $builder->addDefinitions([
-    "mystring" => "ala ma kota",
-    "mytable" => [
-        "entry1" => "value1",
-        "entry2" => "value2"
-    ],
-    "mylogger" => function (\DI\Container $c) {
-        //echo "Executing closure ".__CLASS__."::".__METHOD__."()\n";
-        return new Logger();
+    "prefix"=>"myprefix",
+    "logger"=>function (\DI\Container $c)
+    {
+        return new Logger($c->get("prefix"));
+    },
+    "userManager"=>DI\object(UserManager::class),
+    "controller"=>function (\DI\Container $c)
+    {
+        return new MyController($c->get("userManager"),$c->get("logger"));
     }
 ]);
 $container = $builder->build();
 
-print_r($container->get("mytable"));
-print_r($container->get("mylogger"));
+//print_r($container->get("mytable"));
+//print_r($container->get("mylogger"));
+
+/* @var $controller MyController */
+$controller = $container->get("controller");
+$controller->doSomething();
 
 
 echo "Finished.\n";
