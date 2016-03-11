@@ -12,6 +12,7 @@ $builder->useAnnotations(false);
 $builder->addDefinitions([
     "prefix"=>"myprefix",
     "mailer"=>DI\object(MyMailer::class),
+    "cacheManager"=>DI\object(MyCacheManager::class),
     "logger"=>function (\DI\Container $c)
     {
         return new MyLogger($c->get("prefix"));
@@ -20,27 +21,17 @@ $builder->addDefinitions([
     {
         return new MyUserManager($c->get("mailer"));
     },
-    "controller"=>function (\DI\Container $c)
-    {
-        return new MyController($c->get("userManager"),$c->get("logger"));
-    }
-]);
-
-//add extra wrapper for controller
-$builder->addDefinitions([
-    'controller' => DI\decorate(function (ControllerInterface $previous, ContainerInterface $c) {
-        return new CachedControllerWrapper($previous);
-    }),
+    //invoke constructor and then setter
+    "controller"=>DI\object(MyController::class)
+        ->constructor(DI\get('userManager'), DI\get('logger'))
+        ->method("setCacheManager",DI\get("cacheManager"))
 ]);
 
 $container = $builder->build();
 
-//print_r($container->get("mytable"));
-//print_r($container->get("mylogger"));
-
 /* @var $controller MyController */
 $controller = $container->get("controller");
-$controller->doSomething();
+$controller->doSomethingWithCache();
 
 
 echo "Finished.\n";

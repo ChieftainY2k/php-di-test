@@ -5,12 +5,12 @@ interface MailerInterface
     public function mail($recipient, $content);
 }
 
-class MyMailer implements  MailerInterface
+class MyMailer implements MailerInterface
 {
     public function mail($recipient, $content)
     {
         // send an email to the recipient
-        echo "Executing " . __CLASS__ . "::" . __METHOD__ . "($recipient, $content)\n";
+        echo "Executing " . __METHOD__. "($recipient, $content)\n";
     }
 }
 
@@ -30,14 +30,14 @@ class MyLogger implements LoggerInterface
 
     public function __construct($prefix = null)
     {
-        echo "Executing " . __CLASS__ . "::" . __METHOD__ . "($prefix)\n";
+        echo "Executing " . __METHOD__. "($prefix)\n";
         $this->prefix = $prefix;
     }
 
     public function log($message)
     {
         // send an email to the recipient
-        echo "Executing " . __CLASS__ . "::" . __METHOD__ . "($message) with prefix " . $this->prefix . "\n";
+        echo "Executing " . __METHOD__. "($message) with prefix " . $this->prefix . "\n";
     }
 }
 
@@ -59,26 +59,56 @@ class LoggerFactory
 interface UserManagerInterface
 {
     public function __construct(MailerInterface $mailer);
+
     public function register($email, $password);
 }
 
 
 class MyUserManager implements UserManagerInterface
 {
-    private $mailer;
+    protected $mailer;
 
     public function __construct(MailerInterface $mailer)
     {
-        echo "Executing " . __CLASS__ . "::" . __METHOD__ . "(" . get_class($mailer) . ")\n";
+        echo "Executing " . __METHOD__. "(" . get_class($mailer) . ")\n";
         $this->mailer = $mailer;
     }
 
     public function register($email, $password)
     {
-        echo "Executing " . __CLASS__ . "::" . __METHOD__ . "($email,$password)\n";
+        echo "Executing " . __METHOD__. "($email,$password)\n";
         $this->mailer->mail($email, 'Hello and welcome!');
     }
 }
+
+////////////////////////////////////////////////////////////////////////////////
+interface CacheManagerInterface
+{
+    public function set($name, $data);
+}
+
+class MyCacheManager implements CacheManagerInterface
+{
+    public function set($name, $data)
+    {
+        echo "Executing " . __METHOD__. "($name,$data)\n";
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+interface PrintManagerInterface
+{
+    public function printSomeMessage();
+}
+
+class MyPrintManager implements PrintManagerInterface
+{
+    public function printSomeMessage()
+    {
+        echo "Executing " . __METHOD__. "()\n";
+    }
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -87,25 +117,52 @@ interface ControllerInterface
     public function __construct(UserManagerInterface $userManager, LoggerInterface $logger);
 
     public function doSomething();
+
+    public function setCacheManager(CacheManagerInterface $cacheMgr);
+
+    public function doSomethingWithCache();
+
+    public function doSomethingWithPrint();
 }
 
 class MyController implements ControllerInterface
 {
     private $userManager;
     private $logger;
+    private $cacheMgr;
+    private $printMgr;
 
     public function __construct(UserManagerInterface $userManager, LoggerInterface $logger)
     {
-        echo "Executing " . __CLASS__ . "::" . __METHOD__ . "(" . get_class($userManager) . "," . get_class($logger) . ")\n";
+        echo "Executing " . __METHOD__. "(" . get_class($userManager) . "," . get_class($logger) . ")\n";
         $this->userManager = $userManager;
         $this->logger = $logger;
     }
 
     public function doSomething()
     {
-        echo "Executing " . __CLASS__ . "::" . __METHOD__ . "()\n";
-        $this->userManager->register("ala@makota.pl","password");
+        echo "Executing " . __METHOD__. "()\n";
+        $this->userManager->register("ala@makota.pl", "password");
         $this->logger->log("New user was just registered");
+    }
+
+    public function setCacheManager(CacheManagerInterface $cacheMgr)
+    {
+        echo "Executing " . __METHOD__. "(" . get_class($cacheMgr) . ")\n";
+        $this->cacheMgr = $cacheMgr;
+    }
+
+    public function doSomethingWithCache()
+    {
+        echo "Executing " . __METHOD__. "()\n";
+        $this->doSomething();
+        $this->cacheMgr->set("myKey", "myValue");
+    }
+
+    public function doSomethingWithPrint()
+    {
+        echo "Executing " . __METHOD__. "()\n";
+        $this->printMgr->printSomeMessage();
     }
 }
 
@@ -115,13 +172,15 @@ class CachedControllerWrapper
 
     public function __construct(ControllerInterface $originalController)
     {
-        echo "Executing " . __CLASS__ . "::" . __METHOD__ . "(" . get_class($originalController) . ")\n";
+        echo "Executing " . __METHOD__. "(" . get_class($originalController) . ")\n";
         $this->originalController = $originalController;
     }
 
     public function doSomething()
     {
-        echo "Executing " . __CLASS__ . "::" . __METHOD__ . "()\n";
+        echo "Executing " . __METHOD__. "()\n";
         $this->originalController->doSomething();
     }
 }
+///////////////////////////////////////////////////////////////////////////
+
