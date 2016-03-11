@@ -1,7 +1,5 @@
 <?php
 
-use Interop\Container\ContainerInterface;
-
 require "../vendor/autoload.php";
 require "./classes.php";
 
@@ -12,7 +10,11 @@ $builder->useAnnotations(false);
 $builder->addDefinitions([
     "prefix"=>"myprefix",
     "mailer"=>DI\object(MyMailer::class),
-    "cacheManager"=>DI\object(MyCacheManager::class),
+
+    //SCOPE TEST
+    "cacheManager"=>DI\object(MyCacheManager::class)
+        ->scope(DI\Scope::PROTOTYPE),
+
     "printManager"=>DI\object(MyPrintManager::class),
     "logger"=>function (\DI\Container $c)
     {
@@ -22,29 +24,22 @@ $builder->addDefinitions([
     {
         return new MyUserManager($c->get("mailer"));
     },
-    //invoke constructor and then set the property
+
+    //SCOPE TEST
     "controller"=>DI\object(MyController::class)
+        ->scope(DI\Scope::PROTOTYPE)
         ->constructor(DI\get('userManager'), DI\get('logger'))
         ->method("setCacheManager",DI\get("cacheManager"))
         ->property('printMgr', DI\get('printManager'))
-    ,
-    //alias
-    "controllerAlias"=>DI\get("controller")
-    ,
-    //string with other string
-    "myKey"=>"myValue",
-    "somethingBasedOnKey"=>DI\string('myKey is equal to {myKey}')
+
 
 ]);
 
 $container = $builder->build();
 
-var_dump($container->get("somethingBasedOnKey"));
-
 /* @var $controller MyController */
-$controller = $container->get("controllerAlias");
-//$controller->doSomethingWithCache();
-$controller->doSomethingWithPrint();
+$controller = $container->get("controller");
+$controller = $container->get("controller"); //this will be created again
 
 
 echo "Finished.\n";
