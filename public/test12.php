@@ -10,6 +10,7 @@ $builder->useAnnotations(false);
 
 //USE BUILDER CACHE
 $builder->setDefinitionCache(new Doctrine\Common\Cache\FilesystemCache(__DIR__ . "/../cache/"));
+//$builder->setDefinitionCache(new Doctrine\Common\Cache\PhpFileCache (__DIR__ . "/../cache/"));
 
 $builder->addDefinitions([
     "prefix" => "myprefix",
