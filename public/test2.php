@@ -15,7 +15,7 @@ $builder->addDefinitions([
     ],
     "mylogger" => function (\DI\Container $c) {
         //echo "Executing closure ".__CLASS__."::".__METHOD__."()\n";
-        return new Logger();
+        return new MyLogger();
     }
 ]);
 $container = $builder->build();

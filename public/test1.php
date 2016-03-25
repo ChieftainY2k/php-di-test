@@ -5,7 +5,7 @@ require "./classes.php";
 
 $container = DI\ContainerBuilder::buildDevContainer();
 
-$userManager = $container->get(MyUserManager::class);
+$userManager = $container->get(MyUserManagerWithoutDeps::class);
 $userManager->register("ala@makota.pl","abcd");
 //print_r($userManager);
 
