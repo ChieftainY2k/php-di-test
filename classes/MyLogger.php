@@ -14,6 +14,6 @@ class MyLogger implements LoggerInterface
     public function log($message)
     {
         // send an email to the recipient
-        echo "Executing " . __METHOD__. "($message) with prefix " . $this->prefix . "\n";
+        echo "Executing " . __METHOD__. "($message) with prefix '" . $this->prefix . "'\n";
     }
 }
